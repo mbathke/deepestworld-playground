@@ -13,22 +13,6 @@ struct AppState {
     tx: broadcast::Sender<Snapshot>,
 }
 
-async fn realtime_messages_get(
-    ws: WebSocketUpgrade,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
-    ws.on_upgrade(|ws: WebSocket| async { realtime_messages_stream(state, ws).await })
-}
-
-async fn realtime_messages_stream(app_state: AppState, mut ws: WebSocket) {
-    let mut rx = app_state.tx.subscribe();
-
-    while let Ok(msg) = rx.recv().await {
-        let payload = serde_json::to_string(&msg).unwrap();
-        ws.send(Message::Text(payload)).await.unwrap();
-    }
-}
-
 #[tokio::main]
 async fn main() {
     let (tx, _) = broadcast::channel::<Snapshot>(1);
@@ -55,4 +39,20 @@ async fn main() {
     println!("Listening on {}", addr);
 
     server.await.unwrap();
+}
+
+async fn realtime_messages_get(
+    ws: WebSocketUpgrade,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    ws.on_upgrade(|ws: WebSocket| async { realtime_messages_stream(state, ws).await })
+}
+
+async fn realtime_messages_stream(app_state: AppState, mut ws: WebSocket) {
+    let mut rx = app_state.tx.subscribe();
+
+    while let Ok(msg) = rx.recv().await {
+        let payload = serde_json::to_string(&msg).unwrap();
+        ws.send(Message::Text(payload)).await.unwrap();
+    }
 }
