@@ -28,7 +28,7 @@ const recordDeaths = process.env.DW_RECORD_DEATHS === "true"
 const hideHints = process.env.DW_HIDE_HINTS === "true"
 
 /** @var {string} */
-const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.js'
+const script = process.argv[2] ?? process.env.DW_SCRIPT ?? 'src/starter.ts'
 
 module.exports = {
   username,

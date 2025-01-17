@@ -44,6 +44,12 @@ async function run() {
 
   ipcMain.on('received-ws-data', (event, data) => {
     // log('<', data)
+
+    if (data instanceof ArrayBuffer) {
+      // console.log('Binary data')
+      return
+    }
+    
     const json = JSON.parse(data)
     if (!Array.isArray(json)) {
       console.error('received socket data, but expected an array')
@@ -54,6 +60,7 @@ async function run() {
       return
     }
 
+    log('<', json)
     if (!config.disableTracking) {
       if (json[0] === '' && json[1] === 'seenObjects') {
         tracking.onSeenObjects(json[2])
